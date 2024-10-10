@@ -1,0 +1,17 @@
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\bin\Debug\net8.0\HireWireBackend.Storage.deps.json
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\bin\Debug\net8.0\HireWireBackend.Storage.runtimeconfig.json
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\bin\Debug\net8.0\HireWireBackend.Storage.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\bin\Debug\net8.0\HireWireBackend.Storage.pdb
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\bin\Debug\net8.0\HireWireBackend.Core.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\bin\Debug\net8.0\HireWireBackend.Core.pdb
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.csproj.AssemblyReference.cache
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.AssemblyInfoInputs.cache
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.AssemblyInfo.cs
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.csproj.CoreCompileInputs.cache
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWire.DE306574.Up2Date
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\refint\HireWireBackend.Storage.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.pdb
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.genruntimeconfig.cache
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\ref\HireWireBackend.Storage.dll

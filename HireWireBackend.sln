@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HireWireBackend", "HireWireBackend\HireWireBackend.csproj", "{F95B2BB8-BBC3-4536-B34A-F60D8C168F0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HireWireBackend.Core", "HireWireBackend.Core\HireWireBackend.Core.csproj", "{0082DB41-C09F-42C3-99A6-9BEE1FD1F657}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HireWireBackend.Storage", "HireWireBackend.Storage\HireWireBackend.Storage.csproj", "{D51EA464-A7B7-48F5-98CF-D9E34B2B504E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F95B2BB8-BBC3-4536-B34A-F60D8C168F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F95B2BB8-BBC3-4536-B34A-F60D8C168F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95B2BB8-BBC3-4536-B34A-F60D8C168F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F95B2BB8-BBC3-4536-B34A-F60D8C168F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0082DB41-C09F-42C3-99A6-9BEE1FD1F657}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0082DB41-C09F-42C3-99A6-9BEE1FD1F657}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0082DB41-C09F-42C3-99A6-9BEE1FD1F657}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0082DB41-C09F-42C3-99A6-9BEE1FD1F657}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D51EA464-A7B7-48F5-98CF-D9E34B2B504E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D51EA464-A7B7-48F5-98CF-D9E34B2B504E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D51EA464-A7B7-48F5-98CF-D9E34B2B504E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D51EA464-A7B7-48F5-98CF-D9E34B2B504E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
