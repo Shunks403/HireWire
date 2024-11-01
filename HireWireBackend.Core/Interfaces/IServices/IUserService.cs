@@ -1,17 +1,9 @@
 ﻿namespace HireWireBackend.Core.Interfaces.IServices;
 
-public interface IUserService
+public interface IUserService: IBaseService<User>
 {
     Task<User> Login(string email, string password);
 
     Task<User> Register(User user);
-
-    Task<User> Update(User user);
-
-    Task<User> FindById(int id);
-
-    Task Delete(int id);
-
-    IEnumerable<User> GetAll();
-
+    
 }

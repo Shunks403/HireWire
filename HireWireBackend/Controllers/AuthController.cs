@@ -22,7 +22,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<string>> Register([FromBody] UserDTO userDto)
+    public async Task<ActionResult<string>> Register([FromBody] UserRegistrationDto userDto)
     {
         var userDb = await _userService.Register(_mapper.Map<User>(userDto));
         var jwt = JwtGenerator.GenerateJwt(userDb, _configuration.GetValue<string>("TokenKey")!, DateTime.UtcNow.AddMinutes(5));
