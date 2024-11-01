@@ -75,3 +75,6 @@ C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\obj\Debug\net8.0\Hi
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\obj\Debug\net8.0\ref\HireWireBackend.dll
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Proxies.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\obj\Debug\net8.0\HireWireBackend.sourcelink.json
