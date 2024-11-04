@@ -31,4 +31,9 @@ public class EmployerService : IEmployerService
     {
         return _repository.GetAll<Employer>();
     }
+
+    public Task<Employer> Add(Employer employer)
+    {
+        return _repository.Add(employer);
+    }
 }

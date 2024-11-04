@@ -14,6 +14,7 @@ public class MapperProfile : Profile
         CreateMap<UserRegistrationDto, User>()
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.IsEmployer ? "Employer" : "Applicant"));
         CreateMap<Employer, EmployerDTO>().ReverseMap();
+        CreateMap<JobVacancy, JobVacancyDTO>().ReverseMap();
     }
     
 }

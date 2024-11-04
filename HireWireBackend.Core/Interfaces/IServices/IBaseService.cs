@@ -2,6 +2,7 @@
 
 public interface IBaseService<T>
 {
+
     
     Task<T> Update(T entity);
 

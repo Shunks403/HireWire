@@ -2,5 +2,5 @@
 
 public interface IEmployerService : IBaseService<Employer>
 {
-    
+    public Task<Employer> Add(Employer employer);
 }

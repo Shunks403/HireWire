@@ -24,6 +24,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer((con
 builder.Services.AddTransient<IRepository, Repository>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
+builder.Services.AddTransient<IEmployerService, EmployerService>();
+builder.Services.AddTransient<IJobVacancyService,JobVacancyService>();
 
 
 builder.Services.AddControllers();
@@ -60,6 +62,7 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     options.AddPolicy("ApplicantOnly", policy => policy.RequireRole("Applicant"));
+    options.AddPolicy("EmployerOnly", policy => policy.RequireRole("Employer"));
     
 });
 

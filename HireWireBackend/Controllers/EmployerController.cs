@@ -70,6 +70,15 @@ public class EmployerController : Controller
 
         return NoContent();
     }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateEmployer(EmployerDTO employerDto)
+    {
+        await _employerService.Add(_mapper.Map<Employer>(employerDto));
+        return Ok();
+    }
+    
+    
     
     
 }
