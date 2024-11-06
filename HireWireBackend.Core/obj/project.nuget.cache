@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "dkM8z4rV36Pbg/kPYnTNUq3NUcs4Dc6ik1Tkaj8ROGimtCtlI5zO+/6kZPpHXxSbUO+kZ1a7SR3KaNyL2jZvQQ==",
+  "dgSpecHash": "MBOmEsfP1kO04oM9uLUmABK+6e6d8kZchVeVVx/9PEvPk6CVuuwwsYLsWBDPeF9zIg/bcdeq61OsBnO1jIZJ5Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\Nazar\\RiderProjects\\HireWireBackend\\HireWireBackend.Core\\HireWireBackend.Core.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Nazar\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\Nazar\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\Nazar\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\Nazar\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.7\\microsoft.entityframeworkcore.8.0.7.nupkg.sha512",

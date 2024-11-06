@@ -26,6 +26,8 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 builder.Services.AddTransient<IEmployerService, EmployerService>();
 builder.Services.AddTransient<IJobVacancyService,JobVacancyService>();
+builder.Services.AddTransient<IApplicantService, ApplicantService>();
+builder.Services.AddTransient<IJobApplicationService, JobApplicationService>();
 
 
 builder.Services.AddControllers();

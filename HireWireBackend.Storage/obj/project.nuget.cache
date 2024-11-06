@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "W0ARcJF02J/vQJFoJ9uE1Mnp92x9IcbVPOluS7PqIZHu0qCCkuFC+w6jilrOtByUCTRByfLYnrpzSWmPArjmaw==",
+  "dgSpecHash": "KGzajG+qi6cwywY0ZPmZhpc7lnAefkMbhC5nAM/eiW9iMkcJYmVU8Zw8BMxTq9eO7u0KTAQTaoKqjlFUs+tGRA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Nazar\\RiderProjects\\HireWireBackend\\HireWireBackend.Storage\\HireWireBackend.Storage.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Nazar\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\Nazar\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\Nazar\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
     "C:\\Users\\Nazar\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
