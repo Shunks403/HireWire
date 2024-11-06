@@ -9,7 +9,7 @@ namespace HireWireBackend.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/employer")]
+[Route("api/applicant")]
 public class ApplicantController : Controller
 {
     private readonly IApplicantService _applicantService;
