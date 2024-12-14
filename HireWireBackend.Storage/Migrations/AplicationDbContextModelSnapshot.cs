@@ -15,6 +15,7 @@ namespace HireWireBackend.Storage.Migrations
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
+#pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
@@ -131,6 +132,49 @@ namespace HireWireBackend.Storage.Migrations
                         .HasName("PK__Employer__CA4452614D9889C1");
 
                     b.ToTable("Employers");
+                });
+
+            modelBuilder.Entity("HireWireBackend.Core.Models.JobVacancyTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VacancyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id")
+                        .HasName("PK__JobVacan__3214EC07123F0EEC");
+
+                    b.HasIndex("TagId");
+
+                    b.HasIndex("VacancyId");
+
+                    b.ToTable("JobVacancyTags");
+                });
+
+            modelBuilder.Entity("HireWireBackend.Core.Models.Tag", b =>
+                {
+                    b.Property<int>("TagId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TagId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("TagId")
+                        .HasName("PK__Tags__D5B6E3B69F1A1BA7");
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("JobApplication", b =>
@@ -324,6 +368,27 @@ namespace HireWireBackend.Storage.Migrations
                     b.Navigation("EmployerNavigation");
                 });
 
+            modelBuilder.Entity("HireWireBackend.Core.Models.JobVacancyTag", b =>
+                {
+                    b.HasOne("HireWireBackend.Core.Models.Tag", "Tag")
+                        .WithMany("JobVacancyTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__JobVacanc__TagId__49C3F6B7");
+
+                    b.HasOne("JobVacancy", "Vacancy")
+                        .WithMany("JobVacancyTags")
+                        .HasForeignKey("VacancyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__JobVacanc__Vacan__48CFD27E");
+
+                    b.Navigation("Tag");
+
+                    b.Navigation("Vacancy");
+                });
+
             modelBuilder.Entity("JobApplication", b =>
                 {
                     b.HasOne("Applicant", "Applicant")
@@ -361,9 +426,16 @@ namespace HireWireBackend.Storage.Migrations
                     b.Navigation("JobVacancies");
                 });
 
+            modelBuilder.Entity("HireWireBackend.Core.Models.Tag", b =>
+                {
+                    b.Navigation("JobVacancyTags");
+                });
+
             modelBuilder.Entity("JobVacancy", b =>
                 {
                     b.Navigation("JobApplications");
+
+                    b.Navigation("JobVacancyTags");
                 });
 
             modelBuilder.Entity("User", b =>

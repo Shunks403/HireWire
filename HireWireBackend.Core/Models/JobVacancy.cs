@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-
+using HireWireBackend.Core.Models;
 
 
 public partial class JobVacancy
@@ -46,4 +45,7 @@ public partial class JobVacancy
 
     [InverseProperty("Vacancy")]
     public virtual ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
+    
+    [InverseProperty("Vacancy")]
+    public virtual ICollection<JobVacancyTag> JobVacancyTags { get; set; } = new List<JobVacancyTag>();
 }

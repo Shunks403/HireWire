@@ -19,7 +19,7 @@ var connectionString = builder.Configuration.GetConnectionString("Local");
 var SessionTimeout = (int)builder.Configuration.GetValue(typeof(int), "SessionTimeout");
 var TokenKey = builder.Configuration.GetValue<string>("TokenKey");
 
-builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer((connectionString)).UseLazyLoadingProxies());
+builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer(connectionString).UseLazyLoadingProxies());
 
 builder.Services.AddTransient<IRepository, Repository>();
 builder.Services.AddTransient<IUserService, UserService>();
@@ -54,7 +54,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnMessageReceived = context =>
             {
-                context.Token = context.Request.Cookies["token"];
+                
+                var authorizationHeader = context.Request.Headers["Authorization"].ToString();
+                if (authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.Token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                }
+
                 return Task.CompletedTask;
             }
         };
@@ -83,7 +89,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

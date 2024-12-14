@@ -12,7 +12,10 @@ public static  class JwtGenerator
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-            new Claim(ClaimTypes.Role,user.Role)
+            new Claim(ClaimTypes.Name, user.FirstName),
+            new Claim(ClaimTypes.Surname, user.LastName),
+            new Claim(ClaimTypes.Role,user.Role),
+            new Claim(ClaimTypes.Email, user.Email)
         };
         
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token));

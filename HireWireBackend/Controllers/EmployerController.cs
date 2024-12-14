@@ -57,6 +57,24 @@ public class EmployerController : Controller
         
         return NoContent();
     }
+    
+    [HttpGet("check-profile/{id}")]
+    public async Task<IActionResult> CheckEmployerProfile(int id)
+    {
+        // Ищем работодателя по ID
+        var employer = await _employerService.FindById(id);
+
+        // Если работодатель не найден, возвращаем false
+        if (employer == null)
+        {
+            return Ok(new { hasProfile = false });
+        }
+
+        // Если работодатель найден, возвращаем true
+        return Ok(new { hasProfile = true });
+    }
+    
+    
 
     
     [HttpDelete("{id}")]
