@@ -28,9 +28,20 @@ builder.Services.AddTransient<IEmployerService, EmployerService>();
 builder.Services.AddTransient<IJobVacancyService,JobVacancyService>();
 builder.Services.AddTransient<IApplicantService, ApplicantService>();
 builder.Services.AddTransient<IJobApplicationService, JobApplicationService>();
+builder.Services.AddTransient<IJobVacancyTagService,JobVacancyTagService >();
+builder.Services.AddTransient<ITagService,TagService >();
+
 
 
 builder.Services.AddControllers();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+});
+
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(SessionTimeout);

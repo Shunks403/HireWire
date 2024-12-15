@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HireWireBackend.Core.Interfaces.IServices;
+using HireWireBackend.Core.Models;
 using HireWireBackend.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,18 @@ namespace HireWireBackend.Controllers;
 public class JobVacancyController : Controller
 {
     private readonly IJobVacancyService _jobVacancyService;
+    private readonly ITagService _tagService;
+    private readonly IJobVacancyTagService _jobVacancyTagService;
+    private readonly IEmployerService _employerService;
     private readonly IMapper _mapper;
 
-    public JobVacancyController(IJobVacancyService jobVacancyService, IMapper mapper)
+    public JobVacancyController(IJobVacancyService jobVacancyService, ITagService tagService , IJobVacancyTagService jobVacancyTagService , IEmployerService employerService,IMapper mapper)
     {
         _jobVacancyService = jobVacancyService;
         _mapper = mapper;
+        _tagService = tagService;
+        _jobVacancyTagService = jobVacancyTagService;
+        _employerService = employerService;
     }
 
 
@@ -88,6 +95,68 @@ public class JobVacancyController : Controller
         
     }
     
+    
+    [HttpPost("createWithTags")]
+    [Authorize(Roles = "Employer")]
+    public async Task<IActionResult> CreateJobVacancyWithTags(CreateVacancyWithTagsDTO createDto)
+    {
+        try
+        {
+            // Создание вакансии
+            var jobVacancy = _mapper.Map<JobVacancy>(createDto.JobVacancy);
+            await _jobVacancyService.Add(jobVacancy);
+
+            // Создание или поиск тега
+            foreach (var tagName in createDto.Tags)
+            {
+                var tag = await _tagService.GetOrCreateTagByNameAsync(tagName);
+            
+                // Связь вакансии и тега
+                var jobVacancyTag = new JobVacancyTag
+                {
+                    VacancyId = jobVacancy.VacancyId,
+                    TagId = tag.TagId
+                };
+                await _jobVacancyTagService.Add(jobVacancyTag);
+            }
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    
+    [HttpGet("userVacanciesWithTags")]
+    [Authorize(Roles = "Employer")]
+    public async Task<IActionResult> GetUserVacanciesWithTags(int employerId)
+    {
+        try
+        {
+            var jobVacancies = _jobVacancyService.GetJobVacanciesEmployer(employerId);
+            var employer = _employerService.FindById(employerId).Result;
+            var vacanciesWithTags = jobVacancies.Select(vacancy => new JobVacancyCompactDTO
+            {
+                VacancyId = vacancy.VacancyId,
+                Title = vacancy.Title,
+                Description = vacancy.Description,
+                Location = vacancy.Location,
+                Status = vacancy.Status,
+                CompanyName = employer.CompanyName,
+                Salary = vacancy.Salary ?? 0,
+                CreatedAt = vacancy.CreatedAt ?? DateTime.UtcNow,
+                Tags = vacancy.JobVacancyTags.Select(tag => tag.Tag.Name).ToList()
+            }).ToList();
+
+            return Ok(vacanciesWithTags);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
     
     
 }
