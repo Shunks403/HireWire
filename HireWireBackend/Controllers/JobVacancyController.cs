@@ -159,4 +159,40 @@ public class JobVacancyController : Controller
     }
     
     
+    [HttpGet("globalSearch")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GlobalSearch(string keywords, string location, int page = 1, int pageSize = 10)
+    {
+        try
+        {
+            // Используем сервис для фильтрации и пагинации
+            var result = await _jobVacancyService.GlobalSearch(keywords, location, page, pageSize);
+
+            // Преобразуем вакансии в формат JobVacancyCompactDTO
+            var jobs = result.Jobs.Select(vacancy => new JobVacancyCompactDTO
+            {
+                VacancyId = vacancy.VacancyId,
+                Title = vacancy.Title,
+                Status = vacancy.Status,
+                CompanyName = vacancy.Employer?.CompanyName ?? "Unknown",
+                Description = vacancy.Description,
+                Location = vacancy.Location,
+                Salary = vacancy.Salary ?? 0,
+                CreatedAt = vacancy.CreatedAt ?? DateTime.UtcNow,
+                Tags = vacancy.JobVacancyTags.Select(tag => tag.Tag.Name).ToList()
+            }).ToList();
+
+            return Ok(new
+            {
+                jobs,
+                result.TotalPages
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    
 }
