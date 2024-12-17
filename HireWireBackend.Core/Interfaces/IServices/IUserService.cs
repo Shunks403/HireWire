@@ -6,4 +6,6 @@ public interface IUserService: IBaseService<User>
 
     Task<User> Register(User user);
     
+    Task<User> GetUserByRefreshToken(string refreshToken);
+    
 }

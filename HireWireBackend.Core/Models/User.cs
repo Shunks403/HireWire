@@ -26,7 +26,13 @@ public partial class User
 
     [StringLength(50)]
     public string Role { get; set; } = null!;
+    
+    [Column(TypeName = "nvarchar(512)")]
+    public string? RefreshToken { get; set; }
 
+    [Column(TypeName = "datetime")]
+    public DateTime? RefreshTokenExpiryTime { get; set; }
+    
     public bool? IsDeleted { get; set; }
 
     [Column(TypeName = "datetime")]

@@ -71,4 +71,10 @@ public class UserService : IUserService
     {
         return _repository.GetAll<User>().ToList();
     }
+    
+    public async Task<User> GetUserByRefreshToken(string refreshToken)
+    {
+        return await _repository.GetAll<User>().FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+    }
+    
 }

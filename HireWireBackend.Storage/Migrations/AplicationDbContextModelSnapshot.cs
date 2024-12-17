@@ -322,6 +322,12 @@ namespace HireWireBackend.Storage.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("datetime");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(50)
