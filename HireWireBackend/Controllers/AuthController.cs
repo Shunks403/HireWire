@@ -1,8 +1,13 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Threading.Tasks;
+using AutoMapper;
+using Castle.Core.Configuration;
 using HireWireBackend.Core.Interfaces.IServices;
 using HireWireBackend.DTO;
 using HireWireBackend.DTO.TokenRequestDto;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace HireWireBackend.Controllers;
 
@@ -28,7 +33,7 @@ public class AuthController : Controller
         var userDb = await _userService.Register(_mapper.Map<User>(userDto));
     
         // Генерация Access-токена и Refresh-токена
-        var jwt = JwtGenerator.GenerateJwt(userDb, _configuration["TokenKey"], DateTime.UtcNow.AddMinutes(5));
+        var jwt = JwtGenerator.GenerateJwt(userDb, _configuration["TokenKey"], DateTime.UtcNow.AddMinutes(1));
         var refreshToken = JwtGenerator.GenerateRefreshToken();
 
         // Сохранение Refresh-токена в базе данных
@@ -46,6 +51,8 @@ public class AuthController : Controller
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login([FromQuery] string email, [FromQuery] string password)
     {
+        
+        
         var user = await _userService.Login(email, password);
     
         // Генерация Access-токена и Refresh-токена
@@ -56,7 +63,8 @@ public class AuthController : Controller
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userService.Update(user);
-
+        
+        
         return Ok(new
         {
             AccessToken = jwt,
@@ -66,38 +74,32 @@ public class AuthController : Controller
     
     
     [HttpPost("refresh-token")]
-    public async Task<ActionResult> RefreshToken()
+    public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto tokenRequest)
     {
-        // Получаем refresh-токен из HttpOnly cookie
-        var refreshToken = Request.Cookies["refreshToken"];
+        if (string.IsNullOrEmpty(tokenRequest.RefreshToken))
+        {
+            return BadRequest("Refresh Token is required.");
+        }
 
-        // Проверяем токен и его срок действия
-        var user = await _userService.GetUserByRefreshToken(refreshToken);
+        var user = await _userService.GetUserByRefreshToken(tokenRequest.RefreshToken);
         if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-            return Unauthorized("Invalid or expired refresh token");
+        {
+            return Unauthorized("Invalid or expired Refresh Token.");
+        }
 
-        // Генерация нового Access-токена и Refresh-токена
+        // Генерируем новые токены
         var newAccessToken = JwtGenerator.GenerateJwt(user, _configuration["TokenKey"], DateTime.UtcNow.AddMinutes(5));
         var newRefreshToken = JwtGenerator.GenerateRefreshToken();
 
-        // Обновляем Refresh-токен у пользователя в базе
+        // Обновляем Refresh Token у пользователя
         user.RefreshToken = newRefreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userService.Update(user);
 
-        // Сохраняем новый refresh-токен в HttpOnly cookie
-        Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true, // Только через HTTPS
-            SameSite = SameSiteMode.Strict, // Защита от CSRF
-            Expires = DateTimeOffset.UtcNow.AddDays(7) // Срок действия
-        });
-
-        // Возвращаем только Access-токен
         return Ok(new
         {
-            AccessToken = newAccessToken
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
         });
     }
 }
