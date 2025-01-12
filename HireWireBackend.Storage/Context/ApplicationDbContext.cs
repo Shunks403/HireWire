@@ -89,6 +89,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.Applicant).WithMany(p => p.JobApplications).HasConstraintName("FK__JobApplic__Appli__4D94879B");
 
             entity.HasOne(d => d.Vacancy).WithMany(p => p.JobApplications).HasConstraintName("FK__JobApplic__Vacan__4CA06362");
+            entity.HasIndex(e => new { e.VacancyId, e.ApplicantId })
+                .IsUnique()
+                .HasDatabaseName("IX_Unique_JobApplication");
         });
 
         modelBuilder.Entity<JobVacancy>(entity =>

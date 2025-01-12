@@ -39,4 +39,15 @@ public class ApplicantService : IApplicantService
     {
        return _repository.Add(applicant);
     }
+    
+    
+    public async Task<Applicant> CreateApplicant(Applicant applicant)
+    {
+        return await _repository.Add(applicant);
+    }
+
+    public async Task<Applicant> GetApplicantByUserId(int userId)
+    {
+        return await _repository.GetById<Applicant>(userId);
+    }
 }

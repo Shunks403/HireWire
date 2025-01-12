@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
+using HireWireBackend.Core.Interfaces.ILoggers;
 using HireWireBackend.Core.Interfaces.IServices;
 using HireWireBackend.DTO;
 using Microsoft.AspNetCore.Authorization;
@@ -13,66 +15,297 @@ namespace HireWireBackend.Controllers;
 public class ApplicantController : Controller
 {
     private readonly IApplicantService _applicantService;
+    private readonly IBlobStorageService _blobStorageService;
     private readonly IMapper _mapper;
+    private readonly IBlobLogger _logger;
 
-    public ApplicantController(IApplicantService applicantService, IMapper mapper)
+    public ApplicantController(IApplicantService applicantService, IMapper mapper , IBlobStorageService blobStorageService, IBlobLogger logger)
     {
         _applicantService = applicantService;
+        _blobStorageService = blobStorageService;
         _mapper = mapper;
+        _logger = logger;
     }
     
     [HttpGet]
     public async Task<IActionResult> GetApplicants()
     {
-        var applicants = _applicantService.GetAll();
-        var applicantDtos = _mapper.Map<List<ApplicantDTO>>(applicants);
-        return Ok(applicantDtos);
+        try
+        {
+            await _logger.LogAsync("Fetching all applicants.", "INFO");
+
+            // Попробуем получить всех кандидатов
+            var applicants = _applicantService.GetAll();
+
+            // Проверим, что данные не пустые
+            if (applicants == null || !applicants.Any())
+            {
+                await _logger.LogAsync("No applicants found.", "INFO");
+                return NotFound("No applicants found.");
+            }
+
+            // Попробуем выполнить маппинг
+            List<ApplicantDTO> applicantDtos;
+            try
+            {
+                applicantDtos = _mapper.Map<List<ApplicantDTO>>(applicants);
+                await _logger.LogAsync($"Successfully mapped {applicantDtos.Count} applicants to DTOs.", "INFO");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogAsync($"Error mapping applicants to DTOs. Exception: {ex.Message}", "ERROR");
+                return StatusCode(500, "Error mapping applicants to DTOs.");
+            }
+
+            // Вернем результат
+            await _logger.LogAsync($"Successfully retrieved {applicantDtos.Count} applicants.", "INFO");
+            return Ok(applicantDtos);
+        }
+        catch (Exception ex)
+        {
+            await _logger.LogAsync($"An error occurred while retrieving applicants. Exception: {ex.Message}", "ERROR");
+            return StatusCode(500, "An error occurred while retrieving applicants.");
+        }
     }
 
    
     [HttpGet("{id}")]
     public async Task<IActionResult> GetApplicant(int id)
     {
-        var applicant = await _applicantService.FindById(id);
-        if (applicant == null)
-            return NotFound();
+        try
+        {
+            // Проверяем корректность входных данных
+            if (id <= 0)
+            {
+                return BadRequest("Invalid applicant ID.");
+            }
 
-        var applicantDto = _mapper.Map<ApplicantDTO>(applicant);
-        return Ok(applicantDto);
+            // Пытаемся найти кандидата по ID
+            var applicant = await _applicantService.FindById(id); 
+
+            // Проверяем, найден ли кандидат
+            if (applicant == null)
+            {
+                return NotFound($"Applicant with ID {id} not found.");
+            }
+
+            // Преобразуем найденного кандидата в DTO
+            ApplicantDTO applicantDto;
+            try
+            {
+                applicantDto = _mapper.Map<ApplicantDTO>(applicant);
+            }
+            catch (Exception ex)
+            {
+                
+                return StatusCode(500, "Error mapping applicant to DTO.");
+            }
+
+            // Возвращаем успешный ответ с DTO
+            // Логируем успешное завершение
+            await _logger.LogAsync($"Successfully retrieved applicant with ID {id}.","INFO");
+            return Ok(applicantDto);
+        }
+        catch (Exception ex)
+        {
+            // Логируем успешное завершение
+            await _logger.LogAsync($"Successfully retrieved applicant with ID {id}.","INFO");
+            return StatusCode(500, "An error occurred while retrieving the applicant.");
+        }
     }
-
-   
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateApplicant(int id, ApplicantDTO applicantDto)
-    {
-        if (id != applicantDto.ApplicantId)
-            return BadRequest();
-
-        var applicant = _mapper.Map<Applicant>(applicantDto);
-        await _applicantService.Update(applicant);
-
-        return NoContent();
-    }
-
+    
    
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteApplicant(int id)
     {
-        var applicant = await _applicantService.FindById(id);
-        if (applicant == null)
-            return NotFound();
+        try
+        {
+            // Проверяем корректность входного параметра
+            if (id <= 0)
+            {
+                return BadRequest("Invalid applicant ID.");
+            }
 
-        _applicantService.Delete(applicant.ApplicantId);
+            // Пытаемся найти кандидата по ID
+            var applicant = await _applicantService.FindById(id); 
 
-        return NoContent();
+            // Если кандидат не найден, возвращаем 404
+            if (applicant == null)
+            {
+                return NotFound($"Applicant with ID {id} not found.");
+            }
+
+            // Удаляем кандидата
+            try
+            {
+                await _applicantService.Delete(applicant.ApplicantId); 
+            }
+            catch (Exception ex)
+            {
+                
+                return StatusCode(500, $"An error occurred while deleting the applicant with ID {id}.");
+            }
+
+            // Возвращаем статус 204 (No Content), если удаление прошло успешно
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+           
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
     }
 
    
-    [HttpPost]
-    public async Task<IActionResult> CreateApplicant(ApplicantDTO applicantDto)
+  [HttpPost("create-profile")]
+public async Task<IActionResult> CreateProfile([FromForm] ApplicantDTO profileDto, [FromServices] IBlobLogger blobLogger)
+{
+    try
     {
-        await _applicantService.Add(_mapper.Map<Applicant>(applicantDto));
-        return Ok();
+        // Проверка наличия userId в токене
+        var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            await blobLogger.LogAsync("Unauthorized access attempt: User ID not found in token.","ERROR");
+            return Unauthorized("User ID not found in token.");
+        }
+
+        // Попытка преобразовать userId в int
+        if (!int.TryParse(userIdClaim.Value, out int userId))
+        {
+            await blobLogger.LogAsync("Invalid User ID format in token.","ERROR");
+            return BadRequest("Invalid User ID in token.");
+        }
+
+        // Проверка на наличие файла
+        if (profileDto.File == null || profileDto.File.Length == 0)
+        {
+            await blobLogger.LogAsync($"User ID {userId}: Attempt to create profile without resume file.","ERROR");
+            return BadRequest("Resume file is required.");
+        }
+
+        string resumeUrl;
+        try
+        {
+            // Загружаем файл в Azure Blob Storage
+            resumeUrl = await _blobStorageService.UploadFileAsync(profileDto.File);
+        }
+        catch (Exception ex)
+        {
+            // Логируем ошибку загрузки файла
+            await blobLogger.LogAsync($"User ID {userId}: Error uploading resume file. Exception: {ex.Message}","ERROR");
+            return StatusCode(500, "Error uploading resume file.");
+        }
+
+        // Создаем объект Applicant
+        var applicant = new Applicant
+        {
+            ApplicantId = userId,
+            Resume = resumeUrl,
+            Skills = profileDto.Skills,
+            Education = profileDto.Education,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        Applicant createdApplicant;
+        try
+        {
+            // Сохраняем данные в базу
+            createdApplicant = await _applicantService.CreateApplicant(applicant); 
+        }
+        catch (Exception ex)
+        {
+            // Логируем ошибку создания профиля
+            await blobLogger.LogAsync($"User ID {userId}: Error creating applicant profile. Exception: {ex.Message}","ERROR");
+            return StatusCode(500, "An error occurred while creating the applicant profile.");
+        }
+
+        // Логируем успешное создание профиля
+        await blobLogger.LogAsync($"User ID {userId}: Applicant profile created successfully with ID {createdApplicant.ApplicantId}.","INFO");
+
+        // Возвращаем успешный ответ
+        return Ok(new
+        {
+            message = "Applicant profile created successfully.",
+            applicantId = createdApplicant.ApplicantId
+        });
     }
+    catch (Exception ex)
+    {
+        // Логируем общую ошибку
+        await blobLogger.LogAsync($"Unexpected error in CreateProfile. Exception: {ex.Message}","ERROR");
+        return StatusCode(500, "An unexpected error occurred while processing your request.");
+    }
+}
+    
+    
+    [HttpPut("update-profile/{id}")]
+public async Task<IActionResult> UpdateProfile(int id, [FromForm] ApplicantDTO profileDto, [FromServices] IBlobLogger blobLogger)
+{
+    try
+    {
+        // Логируем начало обновления профиля
+        await blobLogger.LogAsync($"Start updating profile for Applicant ID {id}.","INFO");
+
+        // Ищем кандидата в базе
+        var applicant = await _applicantService.FindById(id);
+        if (applicant == null)
+        {
+            await blobLogger.LogAsync($"Applicant ID {id} not found.","ERROR");
+            return NotFound(new { message = "Applicant not found." });
+        }
+
+        // Если передан новый файл резюме
+        if (profileDto.File != null && profileDto.File.Length > 0)
+        {
+            try
+            {
+                // Удаляем старое резюме, если оно существует
+                if (!string.IsNullOrEmpty(applicant.Resume))
+                {
+                    await blobLogger.LogAsync($"Deleting old resume for Applicant ID {id}.","INFO");
+                    await _blobStorageService.DeleteFileAsync(applicant.Resume);
+                }
+
+                // Загружаем новое резюме
+                await blobLogger.LogAsync($"Uploading new resume for Applicant ID {id}.","INFO");
+                var resumeUrl = await _blobStorageService.UploadFileAsync(profileDto.File);
+                applicant.Resume = resumeUrl;
+            }
+            catch (Exception ex)
+            {
+                // Логируем ошибку загрузки нового резюме
+                await blobLogger.LogAsync($"Error uploading new resume for Applicant ID {id}. Exception: {ex.Message}","ERROR");
+                return StatusCode(500, new { message = "Failed to upload new resume.", details = ex.Message });
+            }
+        }
+
+        // Обновляем остальные данные кандидата
+        applicant.Skills = profileDto.Skills;
+        applicant.Education = profileDto.Education;
+
+        try
+        {
+            // Обновляем запись в базе
+            await _applicantService.Update(applicant);
+            await blobLogger.LogAsync($"Applicant ID {id} successfully updated.","INFO");
+        }
+        catch (Exception ex)
+        {
+            // Логируем ошибку обновления записи
+            await blobLogger.LogAsync($"Error updating Applicant ID {id}. Exception: {ex.Message}","ERROR");
+            return StatusCode(500, new { message = "Failed to update applicant data.", details = ex.Message });
+        }
+
+        // Успешное завершение обновления
+        return Ok(new { message = "Applicant profile updated successfully." });
+    }
+    catch (Exception ex)
+    {
+        // Логируем общую ошибку
+        await blobLogger.LogAsync($"Unexpected error while updating Applicant ID {id}. Exception: {ex.Message}","ERROR");
+        return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+    }
+}
     
 }

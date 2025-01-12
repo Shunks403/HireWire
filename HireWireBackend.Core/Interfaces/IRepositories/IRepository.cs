@@ -11,4 +11,6 @@ public interface IRepository
     Task<T> GetById<T>(int id) where T : class;
     
     IQueryable<T> GetAll<T>() where T : class;
+
+    Task<IEnumerable<T>> GetAllAsync<T>() where T : class;
 }

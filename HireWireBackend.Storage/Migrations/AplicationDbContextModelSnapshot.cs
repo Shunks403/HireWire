@@ -216,7 +216,10 @@ namespace HireWireBackend.Storage.Migrations
 
                     b.HasIndex("ApplicantId");
 
-                    b.HasIndex("VacancyId");
+                    b.HasIndex("VacancyId", "ApplicantId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Unique_JobApplication")
+                        .HasFilter("[VacancyId] IS NOT NULL AND [ApplicantId] IS NOT NULL");
 
                     b.ToTable("JobApplications");
                 });

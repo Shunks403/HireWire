@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HireWireBackend.Storage")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dbd9957fbc615ce7903cc16ccd70bb556617bc2b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+898ffb8aa069420d0d87ed6e431c58ff98c50a86")]
 [assembly: System.Reflection.AssemblyProductAttribute("HireWireBackend.Storage")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HireWireBackend.Storage")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

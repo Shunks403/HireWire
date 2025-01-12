@@ -1,6 +1,7 @@
 
 using System.Text;
 using AutoMapper;
+using HireWireBackend.Core.Interfaces.ILoggers;
 using HireWireBackend.Core.Interfaces.IServices;
 using HireWireBackend.Core.Services;
 using HireWireBackend.Mapper;
@@ -30,7 +31,17 @@ builder.Services.AddTransient<IApplicantService, ApplicantService>();
 builder.Services.AddTransient<IJobApplicationService, JobApplicationService>();
 builder.Services.AddTransient<IJobVacancyTagService,JobVacancyTagService >();
 builder.Services.AddTransient<ITagService,TagService >();
+builder.Services.AddTransient<IBlobStorageService, BlobStorageService>();
+builder.Services.AddSingleton<IBlobLogger>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var azureBlobConfig = configuration.GetSection("AzureBlobStorage");
 
+    var connectionString = azureBlobConfig["ConnectionString"];
+    var containerName = azureBlobConfig["ContainerLogger"];
+
+    return new AzureBlobLogger(connectionString, containerName);
+});
 
 
 builder.Services.AddControllers();
