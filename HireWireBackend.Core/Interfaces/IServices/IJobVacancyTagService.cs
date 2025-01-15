@@ -10,4 +10,6 @@ public interface IJobVacancyTagService
     IQueryable<JobVacancyTag> GetAll();
     
     Task<List<Tag>> GetTagsByVacancyIdAsync(int vacancyId);
+
+    Task DeleteVacancyTagAsync(int vacancyId, int tagId);
 }

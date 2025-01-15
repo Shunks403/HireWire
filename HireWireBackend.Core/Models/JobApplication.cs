@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.Text.Json.Serialization;
 
 
 public partial class JobApplication
@@ -30,9 +30,11 @@ public partial class JobApplication
 
     [ForeignKey("ApplicantId")]
     [InverseProperty("JobApplications")]
+    [JsonIgnore]
     public virtual Applicant? Applicant { get; set; }
 
     [ForeignKey("VacancyId")]
     [InverseProperty("JobApplications")]
+    [JsonIgnore]
     public virtual JobVacancy? Vacancy { get; set; }
 }

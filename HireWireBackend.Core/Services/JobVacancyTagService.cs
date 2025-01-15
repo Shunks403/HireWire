@@ -23,7 +23,19 @@ public class JobVacancyTagService : IJobVacancyTagService
     {
         await _repository.Delete<JobVacancyTag>(id);
     }
+    
+    public async Task DeleteVacancyTagAsync(int vacancyId, int tagId)
+    {
+        var vacancyTag = await _repository.FirstOrDefaultAsync<JobVacancyTag>(jt => jt.VacancyId == vacancyId && jt.TagId == tagId);
 
+        if (vacancyTag != null)
+        {
+            await _repository.Delete<JobVacancyTag>(vacancyTag.Id);
+        }
+    }
+    
+    
+    
     public async Task<JobVacancyTag> Get(int id)
     {
         return await _repository.GetById<JobVacancyTag>(id);

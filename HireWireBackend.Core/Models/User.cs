@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 
 public partial class User
@@ -45,11 +46,14 @@ public partial class User
     public DateTime? DeletedAt { get; set; }
 
     [InverseProperty("Admin")]
+    [JsonIgnore]
     public virtual ICollection<AdminAction> AdminActions { get; set; } = new List<AdminAction>();
 
     [InverseProperty("ApplicantNavigation")]
+    [JsonIgnore]
     public virtual Applicant? Applicant { get; set; }
 
     [InverseProperty("EmployerNavigation")]
+    [JsonIgnore]
     public virtual Employer? Employer { get; set; }
 }

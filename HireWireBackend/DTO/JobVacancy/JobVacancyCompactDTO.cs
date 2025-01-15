@@ -8,6 +8,8 @@ public class JobVacancyCompactDTO
     public string Status { get; set; }
     
     public string CompanyName { get; set; }
+    
+    public string Requirements { get; set; }
     public string Description { get; set; }
     public string Location { get; set; }
     public decimal Salary { get; set; }

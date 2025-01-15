@@ -1,6 +1,7 @@
 ﻿using HireWireBackend.Core.Interfaces.IServices;
 using HireWireBackend.Core.Models;
 using LibraryManegerBackend.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HireWireBackend.Core.Services;
 
@@ -16,7 +17,7 @@ public class TagService : ITagService
     public async Task<Tag> GetOrCreateTagByNameAsync(string name)
     {
         // Ищем тег в базе данных через репозиторий
-        var tag = _repository.GetAll<Tag>().FirstOrDefault(t => t.Name == name);
+        var tag = await _repository.GetAll<Tag>().FirstOrDefaultAsync(t => t.Name == name);
         
         // Если тег не найден, создаем его
         if (tag == null)

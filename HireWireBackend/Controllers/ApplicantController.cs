@@ -158,7 +158,7 @@ public class ApplicantController : Controller
 
    
   [HttpPost("create-profile")]
-public async Task<IActionResult> CreateProfile([FromForm] ApplicantDTO profileDto, [FromServices] IBlobLogger blobLogger)
+  public async Task<IActionResult> CreateProfile([FromForm] ApplicantDTO profileDto)
 {
     try
     {
@@ -166,21 +166,21 @@ public async Task<IActionResult> CreateProfile([FromForm] ApplicantDTO profileDt
         var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
         if (userIdClaim == null)
         {
-            await blobLogger.LogAsync("Unauthorized access attempt: User ID not found in token.","ERROR");
+            await _logger.LogAsync("Unauthorized access attempt: User ID not found in token.","ERROR");
             return Unauthorized("User ID not found in token.");
         }
 
         // Попытка преобразовать userId в int
         if (!int.TryParse(userIdClaim.Value, out int userId))
         {
-            await blobLogger.LogAsync("Invalid User ID format in token.","ERROR");
+            await _logger.LogAsync("Invalid User ID format in token.","ERROR");
             return BadRequest("Invalid User ID in token.");
         }
 
         // Проверка на наличие файла
         if (profileDto.File == null || profileDto.File.Length == 0)
         {
-            await blobLogger.LogAsync($"User ID {userId}: Attempt to create profile without resume file.","ERROR");
+            await _logger.LogAsync($"User ID {userId}: Attempt to create profile without resume file.","ERROR");
             return BadRequest("Resume file is required.");
         }
 
@@ -193,7 +193,7 @@ public async Task<IActionResult> CreateProfile([FromForm] ApplicantDTO profileDt
         catch (Exception ex)
         {
             // Логируем ошибку загрузки файла
-            await blobLogger.LogAsync($"User ID {userId}: Error uploading resume file. Exception: {ex.Message}","ERROR");
+            await _logger.LogAsync($"User ID {userId}: Error uploading resume file. Exception: {ex.Message}","ERROR");
             return StatusCode(500, "Error uploading resume file.");
         }
 
@@ -216,12 +216,12 @@ public async Task<IActionResult> CreateProfile([FromForm] ApplicantDTO profileDt
         catch (Exception ex)
         {
             // Логируем ошибку создания профиля
-            await blobLogger.LogAsync($"User ID {userId}: Error creating applicant profile. Exception: {ex.Message}","ERROR");
+            await _logger.LogAsync($"User ID {userId}: Error creating applicant profile. Exception: {ex.Message}","ERROR");
             return StatusCode(500, "An error occurred while creating the applicant profile.");
         }
 
         // Логируем успешное создание профиля
-        await blobLogger.LogAsync($"User ID {userId}: Applicant profile created successfully with ID {createdApplicant.ApplicantId}.","INFO");
+        await _logger.LogAsync($"User ID {userId}: Applicant profile created successfully with ID {createdApplicant.ApplicantId}.","INFO");
 
         // Возвращаем успешный ответ
         return Ok(new
@@ -233,25 +233,25 @@ public async Task<IActionResult> CreateProfile([FromForm] ApplicantDTO profileDt
     catch (Exception ex)
     {
         // Логируем общую ошибку
-        await blobLogger.LogAsync($"Unexpected error in CreateProfile. Exception: {ex.Message}","ERROR");
+        await _logger.LogAsync($"Unexpected error in CreateProfile. Exception: {ex.Message}","ERROR");
         return StatusCode(500, "An unexpected error occurred while processing your request.");
     }
 }
     
     
     [HttpPut("update-profile/{id}")]
-public async Task<IActionResult> UpdateProfile(int id, [FromForm] ApplicantDTO profileDto, [FromServices] IBlobLogger blobLogger)
+public async Task<IActionResult> UpdateProfile(int id, [FromForm] ApplicantDTO profileDto)
 {
     try
     {
         // Логируем начало обновления профиля
-        await blobLogger.LogAsync($"Start updating profile for Applicant ID {id}.","INFO");
+        await _logger.LogAsync($"Start updating profile for Applicant ID {id}.","INFO");
 
         // Ищем кандидата в базе
         var applicant = await _applicantService.FindById(id);
         if (applicant == null)
         {
-            await blobLogger.LogAsync($"Applicant ID {id} not found.","ERROR");
+            await _logger.LogAsync($"Applicant ID {id} not found.","ERROR");
             return NotFound(new { message = "Applicant not found." });
         }
 
@@ -263,19 +263,19 @@ public async Task<IActionResult> UpdateProfile(int id, [FromForm] ApplicantDTO p
                 // Удаляем старое резюме, если оно существует
                 if (!string.IsNullOrEmpty(applicant.Resume))
                 {
-                    await blobLogger.LogAsync($"Deleting old resume for Applicant ID {id}.","INFO");
+                    await _logger.LogAsync($"Deleting old resume for Applicant ID {id}.","INFO");
                     await _blobStorageService.DeleteFileAsync(applicant.Resume);
                 }
 
                 // Загружаем новое резюме
-                await blobLogger.LogAsync($"Uploading new resume for Applicant ID {id}.","INFO");
+                await _logger.LogAsync($"Uploading new resume for Applicant ID {id}.","INFO");
                 var resumeUrl = await _blobStorageService.UploadFileAsync(profileDto.File);
                 applicant.Resume = resumeUrl;
             }
             catch (Exception ex)
             {
                 // Логируем ошибку загрузки нового резюме
-                await blobLogger.LogAsync($"Error uploading new resume for Applicant ID {id}. Exception: {ex.Message}","ERROR");
+                await _logger.LogAsync($"Error uploading new resume for Applicant ID {id}. Exception: {ex.Message}","ERROR");
                 return StatusCode(500, new { message = "Failed to upload new resume.", details = ex.Message });
             }
         }
@@ -288,12 +288,12 @@ public async Task<IActionResult> UpdateProfile(int id, [FromForm] ApplicantDTO p
         {
             // Обновляем запись в базе
             await _applicantService.Update(applicant);
-            await blobLogger.LogAsync($"Applicant ID {id} successfully updated.","INFO");
+            await _logger.LogAsync($"Applicant ID {id} successfully updated.","INFO");
         }
         catch (Exception ex)
         {
             // Логируем ошибку обновления записи
-            await blobLogger.LogAsync($"Error updating Applicant ID {id}. Exception: {ex.Message}","ERROR");
+            await _logger.LogAsync($"Error updating Applicant ID {id}. Exception: {ex.Message}","ERROR");
             return StatusCode(500, new { message = "Failed to update applicant data.", details = ex.Message });
         }
 
@@ -303,7 +303,7 @@ public async Task<IActionResult> UpdateProfile(int id, [FromForm] ApplicantDTO p
     catch (Exception ex)
     {
         // Логируем общую ошибку
-        await blobLogger.LogAsync($"Unexpected error while updating Applicant ID {id}. Exception: {ex.Message}","ERROR");
+        await _logger.LogAsync($"Unexpected error while updating Applicant ID {id}. Exception: {ex.Message}","ERROR");
         return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
     }
 }

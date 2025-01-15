@@ -31,27 +31,27 @@ public class AuthController : Controller
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<string>> Register([FromBody] UserRegistrationDto userDto, [FromServices] IBlobLogger blobLogger)
+    public async Task<ActionResult<string>> Register([FromBody] UserRegistrationDto userDto)
     {
         try
         {
             // Логируем начало регистрации
-            await blobLogger.LogAsync($"Starting registration process for user: {userDto.Email}", "INFO");
+            await _logger.LogAsync($"Starting registration process for user: {userDto.Email}", "INFO");
 
             // Регистрируем пользователя
             var userDb = await _userService.Register(_mapper.Map<User>(userDto));
-            await blobLogger.LogAsync($"User registered successfully: {userDto.Email}", "INFO");
+            await _logger.LogAsync($"User registered successfully: {userDto.Email}", "INFO");
 
             // Генерация Access-токена и Refresh-токена
             var jwt = JwtGenerator.GenerateJwt(userDb, _configuration["TokenKey"], DateTime.UtcNow.AddMinutes(1));
             var refreshToken = JwtGenerator.GenerateRefreshToken();
-            await blobLogger.LogAsync($"JWT and Refresh Token generated for user: {userDto.Email}", "INFO");
+            await _logger.LogAsync($"JWT and Refresh Token generated for user: {userDto.Email}", "INFO");
 
             // Сохранение Refresh-токена в базе данных
             userDb.RefreshToken = refreshToken;
             userDb.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Refresh-токен живёт 7 дней
             await _userService.Update(userDb);
-            await blobLogger.LogAsync($"Refresh Token saved to database for user: {userDto.Email}", "INFO");
+            await _logger.LogAsync($"Refresh Token saved to database for user: {userDto.Email}", "INFO");
 
             // Возвращаем успешный ответ
             return Ok(new
@@ -63,24 +63,24 @@ public class AuthController : Controller
         catch (Exception ex)
         {
             // Логируем ошибку
-            await blobLogger.LogAsync($"Error occurred during registration process for user: {userDto?.Email}. Exception: {ex.Message}", "ERROR");
+            await _logger.LogAsync($"Error occurred during registration process for user: {userDto?.Email}. Exception: {ex.Message}", "ERROR");
             return StatusCode(500, "An error occurred during registration.");
         }
     }
 
     [HttpPost("login")]
-public async Task<ActionResult<string>> Login([FromQuery] string email, [FromQuery] string password, [FromServices] IBlobLogger blobLogger)
+public async Task<ActionResult<string>> Login([FromQuery] string email, [FromQuery] string password)
 {
     try
     {
         // Логируем начало процесса входа
-        await blobLogger.LogAsync($"Login attempt for email: {email}", "INFO");
+        await _logger.LogAsync($"Login attempt for email: {email}", "INFO");
 
 
         // Проверка входных данных
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
-            await blobLogger.LogAsync("Login failed: Email or password is missing.", "ERROR");
+            await _logger.LogAsync("Login failed: Email or password is missing.", "ERROR");
             return BadRequest("Email and password are required.");
         }
 
@@ -88,21 +88,21 @@ public async Task<ActionResult<string>> Login([FromQuery] string email, [FromQue
         var user = await _userService.Login(email, password);
         if (user == null)
         {
-            await blobLogger.LogAsync($"Login failed: Invalid credentials for email: {email}", "ERROR");
+            await _logger.LogAsync($"Login failed: Invalid credentials for email: {email}", "ERROR");
             return Unauthorized("Invalid email or password.");
         }
-        await blobLogger.LogAsync($"User authenticated successfully: {email}", "INFO");
+        await _logger.LogAsync($"User authenticated successfully: {email}", "INFO");
 
         // Генерация Access-токена и Refresh-токена
         var jwt = JwtGenerator.GenerateJwt(user, _configuration["TokenKey"], DateTime.UtcNow.AddMinutes(5));
         var refreshToken = JwtGenerator.GenerateRefreshToken();
-        await blobLogger.LogAsync($"JWT and Refresh Token generated for email: {email}", "INFO");
+        await _logger.LogAsync($"JWT and Refresh Token generated for email: {email}", "INFO");
 
         // Сохранение Refresh-токена
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userService.Update(user);
-        await blobLogger.LogAsync($"Refresh Token saved to database for user: {email}", "INFO");
+        await _logger.LogAsync($"Refresh Token saved to database for user: {email}", "INFO");
 
         // Возвращаем успешный ответ
         return Ok(new
@@ -114,24 +114,24 @@ public async Task<ActionResult<string>> Login([FromQuery] string email, [FromQue
     catch (Exception ex)
     {
         // Логируем ошибку
-        await blobLogger.LogAsync($"Unexpected error during login for email: {email}. Exception: {ex.Message}", "ERROR");
+        await _logger.LogAsync($"Unexpected error during login for email: {email}. Exception: {ex.Message}", "ERROR");
         return StatusCode(500, "An error occurred during login.");
     }
 }
     
     
     [HttpPost("refresh-token")]
-public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto tokenRequest, [FromServices] IBlobLogger blobLogger)
+public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto tokenRequest)
 {
     try
     {
         // Логируем начало запроса
-        await blobLogger.LogAsync("Refresh token request received.", "INFO");
+        await _logger.LogAsync("Refresh token request received.", "INFO");
 
         // Проверяем, предоставлен ли Refresh Token
         if (string.IsNullOrEmpty(tokenRequest.RefreshToken))
         {
-            await blobLogger.LogAsync("Refresh token request failed: Refresh Token is missing.", "ERROR");
+            await _logger.LogAsync("Refresh token request failed: Refresh Token is missing.", "ERROR");
             return BadRequest("Refresh Token is required.");
         }
 
@@ -139,23 +139,23 @@ public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto tokenRe
         var user = await _userService.GetUserByRefreshToken(tokenRequest.RefreshToken);
         if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
-            await blobLogger.LogAsync($"Refresh token request failed: Invalid or expired token: {tokenRequest.RefreshToken}", "ERROR");
+            await _logger.LogAsync($"Refresh token request failed: Invalid or expired token: {tokenRequest.RefreshToken}", "ERROR");
             return Unauthorized("Invalid or expired Refresh Token.");
         }
 
         // Логируем успешную проверку Refresh Token
-        await blobLogger.LogAsync($"Refresh token validated successfully for user: {user.Email}.", "INFO");
+        await _logger.LogAsync($"Refresh token validated successfully for user: {user.Email}.", "INFO");
 
         // Генерируем новые токены
         var newAccessToken = JwtGenerator.GenerateJwt(user, _configuration["TokenKey"], DateTime.UtcNow.AddMinutes(5));
         var newRefreshToken = JwtGenerator.GenerateRefreshToken();
-        await blobLogger.LogAsync($"New JWT and Refresh Token generated for user: {user.Email}.", "INFO");
+        await _logger.LogAsync($"New JWT and Refresh Token generated for user: {user.Email}.", "INFO");
 
         // Обновляем Refresh Token у пользователя
         user.RefreshToken = newRefreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userService.Update(user);
-        await blobLogger.LogAsync($"Refresh token updated in database for user: {user.Email}.", "INFO");
+        await _logger.LogAsync($"Refresh token updated in database for user: {user.Email}.", "INFO");
 
         // Возвращаем успешный ответ
         return Ok(new
@@ -167,7 +167,7 @@ public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto tokenRe
     catch (Exception ex)
     {
         // Логируем общую ошибку
-        await blobLogger.LogAsync($"Unexpected error during refresh token process. Exception: {ex.Message}", "ERROR");
+        await _logger.LogAsync($"Unexpected error during refresh token process. Exception: {ex.Message}", "ERROR");
         return StatusCode(500, "An error occurred while processing the refresh token.");
     }
 }

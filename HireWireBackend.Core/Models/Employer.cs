@@ -29,8 +29,10 @@ public partial class Employer
 
     [ForeignKey("EmployerId")]
     [InverseProperty("Employer")]
+    [JsonIgnore]
     public virtual User EmployerNavigation { get; set; } = null!;
 
     [InverseProperty("Employer")]
+    [JsonIgnore]
     public virtual ICollection<JobVacancy> JobVacancies { get; set; } = new List<JobVacancy>();
 }

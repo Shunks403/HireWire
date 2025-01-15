@@ -40,7 +40,7 @@ public class JobVacancyService : IJobVacancyService
 
     public IEnumerable<JobVacancy> GetJobVacanciesEmployer(int EmployerId)
     {
-        var listJobVacancies = _repository.GetAll<JobVacancy>().Where(x => x.EmployerId == EmployerId).ToList();
+        var listJobVacancies = _repository.GetAll<JobVacancy>().Where(x => x.EmployerId == EmployerId && x.IsDeleted == false || x.IsDeleted == null ).ToList();
         return listJobVacancies;
     }
 

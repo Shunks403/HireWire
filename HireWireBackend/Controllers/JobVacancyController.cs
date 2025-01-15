@@ -54,24 +54,55 @@ public class JobVacancyController : Controller
     
     [HttpPut("update")]
     [Authorize(Roles = "Employer")]
-    public async Task<IActionResult> UpdateJobVacancy(JobVacancyDTO jobVacancyDto)
+    public async Task<IActionResult> UpdateJobVacancyWithTags(UpdateVacancyWithTagsDTO updateDto)
     {
         try
         {
-            await _logger.LogAsync($"Attempting to update job vacancy with ID {jobVacancyDto.VacancyId}.", "INFO");
+            await _logger.LogAsync($"Attempting to update job vacancy with ID {updateDto.JobVacancy.VacancyId} and tags.", "INFO");
 
-            await _jobVacancyService.Update(_mapper.Map<JobVacancy>(jobVacancyDto));
+            // Обновление вакансии
+            var jobVacancy = _mapper.Map<JobVacancy>(updateDto.JobVacancy);
+            await _jobVacancyService.Update(jobVacancy);
+            await _logger.LogAsync($"Job vacancy with ID {updateDto.JobVacancy.VacancyId} updated successfully.", "INFO");
 
-            await _logger.LogAsync($"Job vacancy with ID {jobVacancyDto.VacancyId} updated successfully.", "INFO");
+            // Удаление старых связей между вакансиями и тегами
+            var existingTags = await _jobVacancyTagService.GetTagsByVacancyIdAsync(jobVacancy.VacancyId);
+            Console.WriteLine("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+            Console.WriteLine(existingTags.ToString());
+            Console.WriteLine(existingTags.Count);
+            Console.WriteLine(updateDto.Tags);
+            Console.WriteLine(updateDto.Tags.Count);
+            
+            foreach (var existingTag in existingTags)
+            {
+                Console.WriteLine(existingTag.TagId);
+                await _jobVacancyTagService.DeleteVacancyTagAsync(jobVacancy.VacancyId , existingTag.TagId);
+                await _logger.LogAsync($"Old tag '{existingTag.Name}' removed from job vacancy with ID {jobVacancy.VacancyId}.", "INFO");
+            }
+
+            // Создание или обновление тегов и их привязка к вакансии
+            foreach (var tagName in updateDto.Tags)
+            {
+                var tag = await _tagService.GetOrCreateTagByNameAsync(tagName);
+                await _logger.LogAsync($"Tag '{tagName}' (ID {tag.TagId}) found or created successfully.", "INFO");
+
+                var jobVacancyTag = new JobVacancyTag
+                {
+                    VacancyId = jobVacancy.VacancyId,
+                    TagId = tag.TagId
+                };
+                await _jobVacancyTagService.Add(jobVacancyTag);
+                await _logger.LogAsync($"Tag '{tagName}' linked to job vacancy with ID {jobVacancy.VacancyId}.", "INFO");
+            }
+
             return Ok();
         }
         catch (Exception ex)
         {
-            await _logger.LogAsync($"Failed to update job vacancy with ID {jobVacancyDto.VacancyId}. Exception: {ex.Message}", "ERROR");
+            await _logger.LogAsync($"Failed to update job vacancy with ID {updateDto?.JobVacancy?.VacancyId}. Exception: {ex.Message}", "ERROR");
             return BadRequest(ex.Message);
         }
     }
-    
     
     [HttpGet("vacancies")]
     [Authorize(Roles = "Employer")]
@@ -264,6 +295,7 @@ public class JobVacancyController : Controller
             {
                 VacancyId = vacancy.VacancyId,
                 Title = vacancy.Title,
+                Requirements = vacancy.Requirements,
                 Description = vacancy.Description,
                 Location = vacancy.Location,
                 Status = vacancy.Status,
