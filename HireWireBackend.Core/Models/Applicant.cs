@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.Text.Json.Serialization;
 
 
 public partial class Applicant
@@ -29,8 +29,10 @@ public partial class Applicant
 
     [ForeignKey("ApplicantId")]
     [InverseProperty("Applicant")]
+    [JsonIgnore]
     public virtual User ApplicantNavigation { get; set; } = null!;
 
     [InverseProperty("Applicant")]
+    [JsonIgnore]
     public virtual ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
 }

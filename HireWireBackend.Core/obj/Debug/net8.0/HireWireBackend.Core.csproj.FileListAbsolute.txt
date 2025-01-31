@@ -10,3 +10,4 @@ C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Core\obj\Debug\net8
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Core\obj\Debug\net8.0\HireWireBackend.Core.pdb
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Core\obj\Debug\net8.0\ref\HireWireBackend.Core.dll
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Core\obj\Debug\net8.0\HireWireBackend.Core.csproj.AssemblyReference.cache
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Core\obj\Debug\net8.0\HireWireBackend.Core.sourcelink.json

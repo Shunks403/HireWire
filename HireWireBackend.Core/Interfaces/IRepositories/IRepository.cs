@@ -1,4 +1,6 @@
-﻿namespace LibraryManegerBackend.Core.Interfaces;
+﻿using System.Linq.Expressions;
+
+namespace LibraryManegerBackend.Core.Interfaces;
 
 public interface IRepository
 {
@@ -11,4 +13,8 @@ public interface IRepository
     Task<T> GetById<T>(int id) where T : class;
     
     IQueryable<T> GetAll<T>() where T : class;
+
+    Task<IEnumerable<T>> GetAllAsync<T>() where T : class;
+
+    Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
 }

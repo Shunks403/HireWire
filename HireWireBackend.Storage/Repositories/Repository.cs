@@ -1,5 +1,7 @@
-﻿using HireWireBackend.Storage.Context;
+﻿using System.Linq.Expressions;
+using HireWireBackend.Storage.Context;
 using LibraryManegerBackend.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManegerBackend.Storage;
 
@@ -44,5 +46,15 @@ public class Repository : IRepository
     public IQueryable<T> GetAll<T>() where T : class
     {
         return _context.Set<T>();
+    }
+
+    public async Task<IEnumerable<T>> GetAllAsync<T>() where T : class
+    {
+        return await _context.Set<T>().ToListAsync();
+    }
+
+    public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+    {
+        return await _context.Set<T>().FirstOrDefaultAsync(predicate);
     }
 }

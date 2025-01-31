@@ -15,3 +15,4 @@ C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\n
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.pdb
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.genruntimeconfig.cache
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\ref\HireWireBackend.Storage.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend.Storage\obj\Debug\net8.0\HireWireBackend.Storage.sourcelink.json

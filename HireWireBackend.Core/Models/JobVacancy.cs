@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-
+using System.Text.Json.Serialization;
+using HireWireBackend.Core.Models;
 
 
 public partial class JobVacancy
@@ -29,6 +30,7 @@ public partial class JobVacancy
     [StringLength(50)]
     public string? Status { get; set; }
 
+    [DefaultValue(false)]
     public bool? IsDeleted { get; set; }
 
     [Column(TypeName = "datetime")]
@@ -45,5 +47,10 @@ public partial class JobVacancy
     public virtual Employer? Employer { get; set; }
 
     [InverseProperty("Vacancy")]
+    [JsonIgnore]
     public virtual ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
+    
+    [InverseProperty("Vacancy")]
+    [JsonIgnore]
+    public virtual ICollection<JobVacancyTag> JobVacancyTags { get; set; } = new List<JobVacancyTag>();
 }
