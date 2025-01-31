@@ -32,6 +32,8 @@ builder.Services.AddTransient<IJobApplicationService, JobApplicationService>();
 builder.Services.AddTransient<IJobVacancyTagService,JobVacancyTagService >();
 builder.Services.AddTransient<ITagService,TagService >();
 builder.Services.AddTransient<IBlobStorageService, BlobStorageService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
+
 builder.Services.AddSingleton<IBlobLogger>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();

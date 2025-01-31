@@ -82,3 +82,8 @@ C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\Az
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\Azure.Storage.Common.dll
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\System.ClientModel.dll
 C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\System.IO.Hashing.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\MailKit.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\MimeKit.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Nazar\RiderProjects\HireWireBackend\HireWireBackend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll

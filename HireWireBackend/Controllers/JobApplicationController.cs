@@ -107,7 +107,8 @@ public class JobApplicationController : Controller
             ApplicationId = app.ApplicationId,
             VacancyTitle = app.Vacancy.Title,
             ApplicantName = $"{app.Applicant.ApplicantNavigation.FirstName} {app.Applicant.ApplicantNavigation.LastName}",
-            ResumeUrl = app.Applicant.Resume
+            ResumeUrl = app.Applicant.Resume,
+            ApplicantEmail = app.Applicant.ApplicantNavigation.Email
         });
 
         _logger.LogAsync($"Successfully fetched responses for employer with ID {employerId}.", "INFO");

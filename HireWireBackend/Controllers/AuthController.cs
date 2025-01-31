@@ -21,13 +21,14 @@ public class AuthController : Controller
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
     private readonly IBlobLogger _logger;
-
-    public AuthController(IUserService userService, IConfiguration configuration,IMapper mapper , IBlobLogger logger)
+    private readonly IEmailService _emailService;
+    public AuthController(IUserService userService, IConfiguration configuration,IMapper mapper , IBlobLogger logger , IEmailService emailService)
     {
         _userService = userService;
         _configuration = configuration;
         _mapper = mapper;
         _logger = logger;
+        _emailService = emailService;
     }
 
     [HttpPost("register")]
@@ -53,12 +54,28 @@ public class AuthController : Controller
             await _userService.Update(userDb);
             await _logger.LogAsync($"Refresh Token saved to database for user: {userDto.Email}", "INFO");
 
+            var replacements = new Dictionary<string, string>
+            {
+                { "UserName", userDto.FirstName }
+            };
+
+            // Send the welcome email
+            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Emails", "WelcomeEmailTemplate.html");
+            await _emailService.SendEmailAsync(
+                userDto.Email,
+                "Добро пожаловать!",
+                templatePath,
+                replacements
+            );
+            
+            
             // Возвращаем успешный ответ
             return Ok(new
             {
                 AccessToken = jwt,
                 RefreshToken = refreshToken
             });
+            
         }
         catch (Exception ex)
         {

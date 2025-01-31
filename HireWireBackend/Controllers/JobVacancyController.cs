@@ -62,6 +62,7 @@ public class JobVacancyController : Controller
 
             // Обновление вакансии
             var jobVacancy = _mapper.Map<JobVacancy>(updateDto.JobVacancy);
+            jobVacancy.IsDeleted = false;
             await _jobVacancyService.Update(jobVacancy);
             await _logger.LogAsync($"Job vacancy with ID {updateDto.JobVacancy.VacancyId} updated successfully.", "INFO");
 
@@ -230,7 +231,7 @@ public class JobVacancyController : Controller
     
     [HttpGet("globalSearch")]
     [AllowAnonymous]
-    public async Task<IActionResult> GlobalSearch(string keywords, string location, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> GlobalSearch(string keywords = "", string location = "", int page = 1, int pageSize = 6)
     {
         try
         {

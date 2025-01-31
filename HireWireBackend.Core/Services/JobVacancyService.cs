@@ -16,6 +16,7 @@ public class JobVacancyService : IJobVacancyService
 
     public Task<JobVacancy> Update(JobVacancy entity)
     {
+       
         return _repository.Update(entity);
     }
 
@@ -40,7 +41,7 @@ public class JobVacancyService : IJobVacancyService
 
     public IEnumerable<JobVacancy> GetJobVacanciesEmployer(int EmployerId)
     {
-        var listJobVacancies = _repository.GetAll<JobVacancy>().Where(x => x.EmployerId == EmployerId && x.IsDeleted == false || x.IsDeleted == null ).ToList();
+        var listJobVacancies = _repository.GetAll<JobVacancy>().Where(x => x.EmployerId == EmployerId && x.IsDeleted == false  ).ToList();
         return listJobVacancies;
     }
 
@@ -54,6 +55,7 @@ public class JobVacancyService : IJobVacancyService
     {
         // Получаем базовый запрос
         var query = _repository.GetAll<JobVacancy>()
+            .Where(x => x.IsDeleted == false  )
             .Include(j => j.Employer) // Подгружаем данные работодателя
             .Include(j => j.JobVacancyTags) // Подгружаем теги
             .ThenInclude(jvt => jvt.Tag)
@@ -68,6 +70,7 @@ public class JobVacancyService : IJobVacancyService
         // Применяем фильтрацию по локации
         if (!string.IsNullOrWhiteSpace(location))
         {
+            
             query = query.Where(j => j.Location.Contains(location));
         }
 
